@@ -1,6 +1,12 @@
 SCRIPTS_DIR := scripts
 BASH_SCRIPT := generate_ast.sh
 
+.PHONY: activate
+
+activate:
+	@echo "Activating virtual environment..."
+	@bash -c "source .venv/bin/activate && exec zsh"
+
 .PHONY: ast
 
 ast:
