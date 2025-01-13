@@ -1,5 +1,5 @@
-from lox_token import Token, TokenType
-from error import error
+from tokens import Token, TokenType
+from error import LoxSyntaxError
 from typing import List, Optional
 
 
@@ -100,7 +100,7 @@ class Scanner:
             case _ if self.is_alpha(c):
                 self.identifier()
             case _:
-                error(self.line, "Unexpected character.")
+                raise LoxSyntaxError(self.line, "Unexpected character.")
 
     def advance(self) -> str:
         char: str = self.source[self.current]
@@ -134,8 +134,7 @@ class Scanner:
             self.advance()
 
         if self.is_at_end():
-            error(self.line, "Unterminated string.")
-            return
+            raise LoxSyntaxError(self.line, "Unterminated string.")
 
         # Consume the closing ".
         self.advance()
@@ -205,4 +204,4 @@ class Scanner:
                 self.advance()
 
         if nesting_level > 0:
-            error(self.line, "Unterminated block comment.")
+            raise LoxSyntaxError(self.line, "Unterminated block comment.")
