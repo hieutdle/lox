@@ -7,6 +7,7 @@ def define_ast(output_dir, base_name, types):
     path = os.path.join(output_dir, f"{base_name.lower()}.py")
     with open(path, "w") as f:
         f.write("from abc import ABC, abstractmethod\n\n")
+        f.write("from pylox.tokens import Token\n\n")
         f.write(f"class {base_name}Visitor(ABC):\n")
 
         for expr_type in types:
@@ -55,9 +56,9 @@ if __name__ == "__main__":
         default_output_dir,
         "Expr",
         [
-            "Binary   : Expr left, str operator, Expr right",
+            "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : object value",
-            "Unary    : str operator, Expr right",
+            "Unary    : Token operator, Expr right",
         ],
     )

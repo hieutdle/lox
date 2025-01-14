@@ -26,6 +26,32 @@ class AstPrinter(ExprVisitor):
         return result
 
 
+# In reverse Polish notation (RPN),
+# the operands to an arithmetic operator are both placed before the operator,
+# so 1 + 2 becomes 1 2 +
+# Define a visitor class for our syntax tree classes that takes an expression,
+# converts it to RPN, and returns the resulting string.
+class RpnAstPrinter(ExprVisitor):
+    def print_expr(self, expr: Expr):
+        return expr.accept(self)
+
+    def visit_binary_expr(self, expr: Binary):
+        return f"{str(expr.left.accept(self))} {str(expr.right.accept(self))} {expr.operator.lexeme}"
+
+    def visit_grouping_expr(self, expr: Grouping):
+        return expr.expression.accept(self)
+
+    def visit_literal_expr(self, expr: Literal):
+        return str(expr.value)
+
+    def visit_unary_expr(self, expr: Unary):
+        op = expr.operator.lexeme
+        if op == "-":
+            # Can't use same symbol for unary and binary.
+            op = "~"
+        return f"{str(expr.right.accept(self))} {op}"
+
+
 if __name__ == "__main__":
     expression = Binary(
         Unary(Token(TokenType.MINUS, "-", None, 1), Literal(123)),
