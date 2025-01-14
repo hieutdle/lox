@@ -125,7 +125,7 @@ def test_if_numbers_scanning_is_valid() -> None:
     123.456
     .456
     123.
-    
+
     // expect: NUMBER 123 123.0
     // expect: NUMBER 123.456 123.456
     // expect: DOT . null

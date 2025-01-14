@@ -5,7 +5,10 @@ def define_ast(output_dir, base_name, types):
     output_dir = os.path.abspath(output_dir)  # Get absolute path
 
     path = os.path.join(output_dir, f"{base_name.lower()}.py")
-    with open(path, "w") as f:
+    with open(path, "w") as f:  # HEADER
+        f.write(
+            "# THIS CODE IS GENERATED AUTOMATICALLY. DO NOT CHANGE IT MANUALLY!\n\n"
+        )
         f.write("from abc import ABC, abstractmethod\n\n")
         f.write("from pylox.tokens import Token\n\n")
         f.write(f"class {base_name}Visitor(ABC):\n")

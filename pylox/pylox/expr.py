@@ -1,3 +1,5 @@
+# THIS CODE IS GENERATED AUTOMATICALLY. DO NOT CHANGE IT MANUALLY!
+
 from abc import ABC, abstractmethod
 
 from pylox.tokens import Token

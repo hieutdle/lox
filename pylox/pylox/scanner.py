@@ -166,9 +166,13 @@ class Scanner:
             while self.is_digit(self.peek()):
                 self.advance()
 
-        # Convert the lexeme to a number and add it as a token
-        value: float = float(self.source[self.start : self.current])
-        self.add_token(TokenType.NUMBER, value)
+            # Convert the lexeme to a float and add it as a token
+            value: float = float(self.source[self.start : self.current])
+            self.add_token(TokenType.NUMBER, value)
+        else:
+            # Convert the lexeme to an int and add it as a token
+            value: int = int(self.source[self.start : self.current])
+            self.add_token(TokenType.NUMBER, value)
 
     def identifier(self) -> None:
         while self.is_alpha_numeric(self.peek()):

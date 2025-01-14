@@ -10,6 +10,7 @@ class Parser:
     def __init__(self, tokens: List[Token]) -> None:
         self.tokens = tokens
         self.current = 0
+        self.errors = []  # Store errors instead of raising immediately
 
     def parse(self) -> Expr:
         try:
@@ -98,6 +99,39 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return expr_ast.Grouping(expr)
 
+        # Error handling
+        if self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            err = self.error(self.previous(), "Missing left-hand operand.")
+            self.equality()
+            raise err
+
+        if self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            err = self.error(self.previous(), "Missing left-hand operand.")
+            self.equality()
+            raise err
+
+        if self.match(
+            TokenType.GREATER,
+            TokenType.GREATER_EQUAL,
+            TokenType.LESS,
+            TokenType.LESS_EQUAL,
+        ):
+            err = self.error(self.previous(), "Missing left-hand operand.")
+            self.comparison()
+            raise err
+
+        if self.match(TokenType.PLUS):
+            err = self.error(self.previous(), "Missing left-hand operand.")
+            self.term()
+            raise err
+
+        if self.match(TokenType.SLASH, TokenType.STAR):
+            err = self.error(self.previous(), "Missing left-hand operand.")
+            self.factor()
+            raise err
+
+        raise self.error(self.peek(), "Expect expression")
+
     # helpers
     def match(self, *token_types: TokenType) -> bool:
         for token_type in token_types:
@@ -134,6 +168,7 @@ class Parser:
 
     def error(self, token: Token, message: str) -> Exception:
         err = LoxParseError(token, message)
+        self.errors.append(err)
 
         return err
 
