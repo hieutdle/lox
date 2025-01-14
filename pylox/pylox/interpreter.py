@@ -1,13 +1,17 @@
 import pylox.expr as expr_ast
-import pylox.stmt as stmt_expr_ast
+import pylox.stmt as stmt_ast
 import typing
 from pylox.error import LoxRuntimeError
 from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 from pylox.stmt import Stmt
+from pylox.environment import Environment
 
 
 class Interpreter(expr_ast.ExprVisitor):
+    def __init__(self):
+        self.environment = Environment()
+
     def interpret(self, statements: list[Stmt]):
         for statement in statements:
             self.execute(statement)
@@ -18,11 +22,26 @@ class Interpreter(expr_ast.ExprVisitor):
     def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
 
-    def visit_expression_stmt(self, stmt: stmt_expr_ast.Expression) -> typing.Any:
+    def visit_var_stmt(self, stmt: stmt_ast.Var) -> typing.Any:
+        value: typing.Any = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
+        self.environment.define(stmt.name.lexeme, value)
+        return None
+
+    def visit_assign_expr(self, expr: expr_ast.Assign) -> typing.Any:
+        value = self.evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
+
+    def visit_variable_expr(self, expr: expr_ast.Variable) -> typing.Any:
+        return self.environment.get(expr.name)
+
+    def visit_expression_stmt(self, stmt: stmt_ast.Expression) -> typing.Any:
         self.evaluate(stmt.expression)
         return None
 
-    def visit_print_stmt(self, stmt: stmt_expr_ast.Print) -> typing.Any:
+    def visit_print_stmt(self, stmt: stmt_ast.Print) -> typing.Any:
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
         return None
@@ -132,4 +151,7 @@ class Interpreter(expr_ast.ExprVisitor):
             return "nil"
         if type(value) is float and float(value).is_integer():
             return str(int(value))
+        if type(value) is bool:
+            return str(value).lower()
+
         return str(value)

@@ -55,10 +55,27 @@ def test_if_parser_parse_and_discard_right_hand_operand_in_case_of_empty_left_ha
 ):
     # GIVEN
     src = "* (123"
-    tokens = Scanner(src).scan_tokens()
 
+    # MOCK
+    cnt = 0
+
+    def handler(err: LoxParseError):
+        nonlocal cnt
+
+        if cnt == 0:
+            assert err.message == "Missing left-hand operand."
+        elif cnt == 1:
+            assert err.message == "Expect ')' after expression."
+        else:
+            assert False
+
+        cnt += 1
+
+    # WHEN
+    tokens = Scanner(src).scan_tokens()
     with pytest.raises(LoxParseError) as err:
-        Parser(tokens).expression()
+        Parser(tokens, handler).expression()
 
     # THEN
     assert "Expect ')' after expression." in err.value.message
+    assert cnt == 2  # both errors have been handled

@@ -11,10 +11,10 @@ def define_ast(output_dir, base_name, types):
         )
         f.write("import typing\n")
         f.write("from abc import ABC, abstractmethod\n\n")
-        if base_name == "Expr":
-            f.write("from pylox.tokens import Token\n\n")
-        elif base_name == "Stmt":
+
+        if base_name == "Stmt":
             f.write("from pylox.expr import Expr\n\n")
+        f.write("from pylox.tokens import Token\n\n")
 
         f.write(f"class {base_name}Visitor(ABC):\n")
 
@@ -67,10 +67,12 @@ if __name__ == "__main__":
         default_output_dir,
         "Expr",
         [
+            "Assign   : Token name, Expr value",
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : object value",
             "Unary    : Token operator, Expr right",
+            "Variable : Token name",
         ],
     )
     define_ast(
@@ -79,5 +81,6 @@ if __name__ == "__main__":
         [
             "Expression : Expr expression",
             "Print      : Expr expression",
+            "Var        : Token name, typing.Optional[Expr] initializer",
         ],
     )

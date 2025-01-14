@@ -1,10 +1,17 @@
 from pylox.expr import Expr, Binary, Grouping, Literal, Unary, ExprVisitor
 from pylox.tokens import Token, TokenType
+import typing
 
 
 class AstPrinter(ExprVisitor):
     def print(self, expr: Expr) -> str:
         return expr.accept(self)
+
+    def visit_assign_expr(self, expr) -> typing.Any:
+        pass
+
+    def visit_variable_expr(self, expr) -> typing.Any:
+        pass
 
     def visit_binary_expr(self, expr: Binary) -> str:
         return self.parenthesize(expr.operator.lexeme, expr.left, expr.right)
@@ -32,6 +39,12 @@ class AstPrinter(ExprVisitor):
 # Define a visitor class for our syntax tree classes that takes an expression,
 # converts it to RPN, and returns the resulting string.
 class RpnAstPrinter(ExprVisitor):
+    def visit_assign_expr(self, expr) -> typing.Any:
+        pass
+
+    def visit_variable_expr(self, expr) -> typing.Any:
+        pass
+
     def print_expr(self, expr: Expr):
         return expr.accept(self)
 

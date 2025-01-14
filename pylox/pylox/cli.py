@@ -1,9 +1,18 @@
 import sys
+import typing as t
+from pathlib import Path
+
 from pylox.scanner import Scanner
 from pylox.error import LoxException, LoxRuntimeError, LoxParseError, LoxSyntaxError
 from pylox.interpreter import Interpreter
 from pylox.parser import Parser
 import typing
+import typer
+from rich import print
+from rich.prompt import Prompt
+
+pylox_cli = typer.Typer()
+Prompt.prompt_suffix = ""  # Get rid of the default colon suffix
 
 
 class Lox:
@@ -50,7 +59,7 @@ class Lox:
             scanner: Scanner = Scanner(source)
             tokens = scanner.scan_tokens()
             # print("Tokens:", [(token.lexeme, token.token_type) for token in tokens])
-            ast = Parser(tokens).parse()
+            ast = Parser(tokens, self.report_error).parse()
             if not self.had_error:
                 self.interpreter.interpret(ast)
         except LoxSyntaxError as e:
@@ -72,7 +81,7 @@ class Lox:
 
     @staticmethod
     def _build_error_string(err: LoxException) -> str:
-        return f"line {err.line + 1}: Error: {err.message}"
+        return f"line {err.line + 1}: [bold red]{err.message}[/bold red]"
 
     def report_error(self, err: LoxException) -> None:
         print(self._build_error_string(err))
@@ -84,6 +93,12 @@ class Lox:
         self.had_runtime_error = True
 
 
-if __name__ == "__main__":
+@pylox_cli.command()
+def main(
+    lox_script: t.Optional[Path] = typer.Argument(default=None),
+) -> None:  # pragma: no cover
     lox = Lox()
-    lox.main()
+    if not lox_script:
+        lox.run_prompt()
+    else:
+        lox.run_file(lox_script)
