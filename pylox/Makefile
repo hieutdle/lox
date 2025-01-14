@@ -18,3 +18,8 @@ ast:
 clean:
 	@echo "Cleaning generated files..."
 	rm -f pylox/expr.py
+
+.PHONY: test
+
+test:
+	PYTHONPATH=pylox pytest tests

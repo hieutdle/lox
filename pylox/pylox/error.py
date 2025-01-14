@@ -1,4 +1,4 @@
-from tokens import Token
+from pylox.tokens import Token
 
 
 class LoxException(BaseException):

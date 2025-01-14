@@ -1,6 +1,6 @@
 import sys
-from scanner import Scanner
-from error import LoxException, LoxRuntimeError, LoxParseError
+from pylox.scanner import Scanner
+from pylox.error import LoxException, LoxRuntimeError, LoxParseError
 
 
 class Lox:

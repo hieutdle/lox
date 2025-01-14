@@ -1,8 +1,8 @@
 from typing import List
-from tokens import Token, TokenType
-from expr import Expr
-import expr as expr_ast
-from error import LoxParseError
+from pylox.tokens import Token, TokenType
+from pylox.expr import Expr
+import pylox.expr as expr_ast
+from pylox.error import LoxParseError
 
 
 # recursive descent, top-down parser

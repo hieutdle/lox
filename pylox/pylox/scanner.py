@@ -1,5 +1,5 @@
-from tokens import Token, TokenType
-from error import LoxSyntaxError
+from pylox.tokens import Token, TokenType
+from pylox.error import LoxSyntaxError
 from typing import List, Optional
 
 
@@ -189,19 +189,25 @@ class Scanner:
         return self.is_alpha(c) or self.is_digit(c)
 
     def block_comment(self) -> None:
-        # Track nesting level
-        nesting_level: int = 1
+        depth: int = 1
 
-        while nesting_level > 0 and not self.is_at_end():
-            if self.peek() == "\n":
-                self.line += 1
+        while depth != 0:
+            if self.is_at_end():
+                # Unterminated block comment
+                raise LoxSyntaxError(
+                    self.line,
+                    "Unterminated block comment.",
+                )
+
+            if self.peek() == "*" and self.peek_next() == "/":
+                depth -= 1
                 self.advance()
-            elif self.match("/*"):
-                nesting_level += 1
-            elif self.match("*/"):
-                nesting_level -= 1
+                self.advance()
+            elif self.peek() == "/" and self.peek_next() == "*":
+                depth += 1
+                self.advance()
+                self.advance()
             else:
+                if self.peek() == "\n":
+                    self.line += 1
                 self.advance()
-
-        if nesting_level > 0:
-            raise LoxSyntaxError(self.line, "Unterminated block comment.")

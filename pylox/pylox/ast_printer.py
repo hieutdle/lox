@@ -1,4 +1,4 @@
-from expr import Expr, Binary, Grouping, Literal, Unary, ExprVisitor
+from pylox.expr import Expr, Binary, Grouping, Literal, Unary, ExprVisitor
 
 
 class AstPrinter(ExprVisitor):
