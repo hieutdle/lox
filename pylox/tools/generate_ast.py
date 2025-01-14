@@ -9,21 +9,27 @@ def define_ast(output_dir, base_name, types):
         f.write(
             "# THIS CODE IS GENERATED AUTOMATICALLY. DO NOT CHANGE IT MANUALLY!\n\n"
         )
+        f.write("import typing\n")
         f.write("from abc import ABC, abstractmethod\n\n")
-        f.write("from pylox.tokens import Token\n\n")
+        if base_name == "Expr":
+            f.write("from pylox.tokens import Token\n\n")
+        elif base_name == "Stmt":
+            f.write("from pylox.expr import Expr\n\n")
+
         f.write(f"class {base_name}Visitor(ABC):\n")
 
         for expr_type in types:
             class_name = expr_type.split(":")[0].strip()
             f.write("    @abstractmethod\n")
             f.write(
-                f"    def visit_{class_name.lower()}_{base_name.lower()}(self, {base_name.lower()}): pass\n\n"
+                f"    def visit_{class_name.lower()}_{base_name.lower()}(self, {base_name.lower()}) -> typing.Any:\n"
             )
+            f.write("        pass\n\n")
 
         f.write(f"\nclass {base_name}(ABC):\n")
         f.write("    @abstractmethod\n")
-        f.write(f"    def accept(self, visitor: {base_name}Visitor): pass\n\n")
-
+        f.write(f"    def accept(self, visitor: {base_name}Visitor)-> typing.Any:\n")
+        f.write("        pass\n\n")
         for expr_type in types:
             class_name = expr_type.split(":")[0].strip()
             fields = expr_type.split(":")[1].strip()
@@ -40,7 +46,9 @@ def define_ast(output_dir, base_name, types):
                 name = field.split(" ")[1].lower()
                 f.write(f"        self.{name} = {name}\n")
 
-            f.write(f"\n    def accept(self, visitor: {base_name}Visitor):\n")
+            f.write(
+                f"\n    def accept(self, visitor: {base_name}Visitor) -> typing.Any:\n"
+            )
             f.write(
                 f"        return visitor.visit_{class_name.lower()}_{base_name.lower()}(self)\n\n"
             )
@@ -63,5 +71,13 @@ if __name__ == "__main__":
             "Grouping : Expr expression",
             "Literal  : object value",
             "Unary    : Token operator, Expr right",
+        ],
+    )
+    define_ast(
+        default_output_dir,
+        "Stmt",
+        [
+            "Expression : Expr expression",
+            "Print      : Expr expression",
         ],
     )

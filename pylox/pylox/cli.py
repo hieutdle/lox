@@ -55,8 +55,7 @@ class Lox:
             tokens = scanner.scan_tokens()
             # print("Tokens:", [(token.lexeme, token.token_type) for token in tokens])
             ast = Parser(tokens).parse()
-            if ast is not None:
-                print(self.interpreter.interpret(ast))
+            print(self.interpreter.interpret(ast))
         except LoxSyntaxError as e:
             self.report_error(e)
         except LoxParseError as e:

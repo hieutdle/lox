@@ -56,13 +56,9 @@ def test_if_parser_parse_and_discard_right_hand_operand_in_case_of_empty_left_ha
     # GIVEN
     src = "* (123"
     tokens = Scanner(src).scan_tokens()
-    parser = Parser(tokens)
 
-    # WHEN
-    parser.parse()
+    with pytest.raises(LoxParseError) as err:
+        Parser(tokens).expression()
 
     # THEN
-    errors = parser.errors
-    assert len(errors) == 2  # Ensure 2 errors were recorded
-    assert errors[0].message == "Missing left-hand operand."  # First error
-    assert errors[1].message == "Expect ')' after expression."  # Second error
+    assert "Expect ')' after expression." in err.value.message

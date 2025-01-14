@@ -3,6 +3,8 @@ from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 import pylox.expr as expr_ast
 from pylox.error import LoxParseError
+from pylox.stmt import Stmt
+import pylox.stmt as stmt_ast
 
 
 # recursive descent, top-down parser
@@ -12,11 +14,12 @@ class Parser:
         self.current = 0
         self.errors = []  # Store errors instead of raising immediately
 
-    def parse(self) -> Expr:
-        try:
-            return self.expression()
-        except LoxParseError as e:
-            return e
+    def parse(self) -> list[Stmt]:
+        # todo: error handling --> catch and process Parse Exception
+        statements: list[Stmt] = []
+        while not self.is_at_end():
+            statements.append(self.statement())
+        return statements
 
     # expression     → equality
     def expression(self) -> Expr:
@@ -132,6 +135,22 @@ class Parser:
             raise err
 
         raise self.error(self.peek(), "Expect expression")
+
+    # statements
+    def statement(self) -> Stmt:
+        if self.match(TokenType.PRINT):
+            return self.print_statement()
+        return self.expression_statement()
+
+    def print_statement(self) -> Stmt:
+        value = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return stmt_ast.Print(value)
+
+    def expression_statement(self) -> Stmt:
+        value = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return stmt_ast.Expression(value)
 
     # helpers
     def match(self, *token_types: TokenType) -> bool:

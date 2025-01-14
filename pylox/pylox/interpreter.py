@@ -2,13 +2,19 @@ import pylox.expr as ast
 import typing
 from pylox.error import LoxRuntimeError
 from pylox.tokens import Token, TokenType
+from pylox.expr import Expr
+from pylox.stmt import Stmt
 
 
 class Interpreter(ast.ExprVisitor):
-    def interpret(self, expr: ast.Expr):
-        return self.stringify(self.evaluate(expr))
+    def interpret(self, statements: list[Stmt]):
+        for statement in statements:
+            self.execute(statement)
 
-    def evaluate(self, expr: ast.Expr) -> typing.Any:
+    def execute(self, stmt: Stmt):
+        stmt.accept(self)
+
+    def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
 
     def visit_literal_expr(self, expr: ast.Literal) -> typing.Any:
