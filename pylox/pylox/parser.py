@@ -57,6 +57,7 @@ class Parser:
             op = self.previous()
             right = self.factor()
             expr = expr_ast.Binary(expr, op, right)
+            # print(f"Created Binary Node: {expr}")
 
         return expr
 
