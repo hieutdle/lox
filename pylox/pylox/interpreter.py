@@ -59,6 +59,11 @@ class Interpreter(ast.ExprVisitor):
                 return float(left) - float(right)
             case TokenType.SLASH:
                 self.check_number_operands(expr.operator, left, right)
+                if float(right) == 0:
+                    raise LoxRuntimeError(
+                        expr.operator,
+                        "Division by zero!",
+                    )
                 return float(left) / float(right)
             case TokenType.STAR:
                 self.check_number_operands(expr.operator, left, right)
@@ -72,11 +77,11 @@ class Interpreter(ast.ExprVisitor):
                     return float(left) + float(right)
 
                 if type(left) is str or type(right) is str:
-                    return str(left) + str(right)
+                    return self.stringify(left) + self.stringify(right)
 
                 raise LoxRuntimeError(
                     expr.operator,
-                    "Operands must be numbers or strings.",
+                    "Operands must be two numbers or two strings.",
                 )
         return "abc"
 

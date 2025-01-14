@@ -76,7 +76,7 @@ class Lox:
 
     @staticmethod
     def _build_error_string(err: LoxException) -> str:
-        return f"line {err.line}: [bold red]{err.message}[/bold red]"
+        return f"line {err.line + 1}: Error: {err.message}"
 
     def report_error(self, err: LoxException) -> None:
         print(self._build_error_string(err))
