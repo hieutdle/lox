@@ -1,11 +1,16 @@
 import sys
 from pylox.scanner import Scanner
-from pylox.error import LoxException, LoxRuntimeError, LoxParseError
+from pylox.error import LoxException, LoxRuntimeError, LoxParseError, LoxSyntaxError
+from pylox.interpreter import Interpreter
+from pylox.parser import Parser
+import typing
 
 
 class Lox:
-    had_error: bool = False
-    had_runtime_error: bool = False
+    def __init__(self) -> None:
+        self.interpreter = Interpreter()
+        self.had_error: bool = False
+        self.had_runtime_error: bool = False
 
     def main(self) -> None:
         arg_count: int = len(sys.argv)
@@ -45,11 +50,28 @@ class Lox:
             sys.exit(70)
 
     def run(self, source: str) -> None:
-        scanner: Scanner = Scanner(source)
-        tokens = scanner.scan_tokens()
+        try:
+            scanner: Scanner = Scanner(source)
+            tokens = scanner.scan_tokens()
+            ast = Parser(tokens).parse()
+            if ast is not None:
+                print(self.stringify(self.interpreter.evaluate(ast)))
+        except LoxSyntaxError as e:
+            self.report_error(e)
+        except LoxParseError as e:
+            self.report_error(e)
+        except LoxRuntimeError as e:
+            self.report_runtime_error(e)
 
-        for token in tokens:
-            print(token)
+    @staticmethod
+    def stringify(value: typing.Any) -> str:
+        if value is None:
+            return "nil"
+
+        if type(value) is float and float(value).is_integer():
+            return str(int(value))
+
+        return str(value)
 
     @staticmethod
     def _build_error_string(err: LoxException) -> str:
