@@ -27,16 +27,12 @@ class Lox:
             line: str = input("> ")
             if not line or line.lower() == "exit":
                 break
-            try:
-                self.run(line)
-            except LoxParseError as e:
-                self.report_error(e)
-            except LoxRuntimeError as e:
-                self.report_runtime_error(e)
+
+            self.run(line)
 
             # Reset error flag after each prompt
-            Lox.had_error = False
-            Lox.had_runtime_error = False
+            self.had_error = False
+            self.had_runtime_error = False
 
     def run_file(self, filename: str) -> None:
         with open(filename, encoding="utf-8") as f:
@@ -55,7 +51,8 @@ class Lox:
             tokens = scanner.scan_tokens()
             # print("Tokens:", [(token.lexeme, token.token_type) for token in tokens])
             ast = Parser(tokens).parse()
-            print(self.interpreter.interpret(ast))
+            if not self.had_error:
+                self.interpreter.interpret(ast)
         except LoxSyntaxError as e:
             self.report_error(e)
         except LoxParseError as e:

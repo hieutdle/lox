@@ -1,4 +1,5 @@
-import pylox.expr as ast
+import pylox.expr as expr_ast
+import pylox.stmt as stmt_expr_ast
 import typing
 from pylox.error import LoxRuntimeError
 from pylox.tokens import Token, TokenType
@@ -6,7 +7,7 @@ from pylox.expr import Expr
 from pylox.stmt import Stmt
 
 
-class Interpreter(ast.ExprVisitor):
+class Interpreter(expr_ast.ExprVisitor):
     def interpret(self, statements: list[Stmt]):
         for statement in statements:
             self.execute(statement)
@@ -17,13 +18,22 @@ class Interpreter(ast.ExprVisitor):
     def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
 
-    def visit_literal_expr(self, expr: ast.Literal) -> typing.Any:
+    def visit_expression_stmt(self, stmt: stmt_expr_ast.Expression) -> typing.Any:
+        self.evaluate(stmt.expression)
+        return None
+
+    def visit_print_stmt(self, stmt: stmt_expr_ast.Print) -> typing.Any:
+        value = self.evaluate(stmt.expression)
+        print(self.stringify(value))
+        return None
+
+    def visit_literal_expr(self, expr: expr_ast.Literal) -> typing.Any:
         return expr.value
 
-    def visit_grouping_expr(self, expr: ast.Grouping) -> typing.Any:
+    def visit_grouping_expr(self, expr: expr_ast.Grouping) -> typing.Any:
         return self.evaluate(expr.expression)
 
-    def visit_unary_expr(self, expr: ast.Unary) -> typing.Any:
+    def visit_unary_expr(self, expr: expr_ast.Unary) -> typing.Any:
         right = self.evaluate(expr.right)
 
         match expr.operator.token_type:
@@ -35,7 +45,7 @@ class Interpreter(ast.ExprVisitor):
             case _:
                 return None  # Fallback case
 
-    def visit_binary_expr(self, expr: ast.Binary) -> typing.Any:
+    def visit_binary_expr(self, expr: expr_ast.Binary) -> typing.Any:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
 

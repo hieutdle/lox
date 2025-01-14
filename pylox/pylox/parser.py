@@ -137,11 +137,15 @@ class Parser:
         raise self.error(self.peek(), "Expect expression")
 
     # statements
+    # statement  → exprStmt
+    #            | printStmt ;
     def statement(self) -> Stmt:
         if self.match(TokenType.PRINT):
             return self.print_statement()
+
         return self.expression_statement()
 
+    # printStmt      → "print" expression ";" ;
     def print_statement(self) -> Stmt:
         value = self.expression()
         self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
