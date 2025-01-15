@@ -79,6 +79,7 @@ if __name__ == "__main__":
         default_output_dir,
         "Stmt",
         [
+            "Block      : typing.List[Stmt] statements",
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, typing.Optional[Expr] initializer",
