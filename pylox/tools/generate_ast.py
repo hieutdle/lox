@@ -79,6 +79,7 @@ if __name__ == "__main__":
         default_output_dir,
         "Stmt",
         [
+            "If         : Expr condition, Stmt then_branch, typing.Optional[Stmt] else_branch",
             "Block      : typing.List[Stmt] statements",
             "Expression : Expr expression",
             "Print      : Expr expression",

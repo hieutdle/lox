@@ -75,16 +75,30 @@ class Parser:
         return stmt_ast.Var(name, initializer)
 
     # statement  → exprStmt
+    #            | ifStmt
     #            | printStmt ;
     #            | block ;
     def statement(self) -> Stmt:
+        if self.match(TokenType.IF):
+            return self.if_statement()
         if self.match(TokenType.PRINT):
             return self.print_statement()
-
         if self.match(TokenType.LEFT_BRACE):
             return stmt_ast.Block(self.block())
 
         return self.expression_statement()
+
+    # ifStmt         → "if" "(" expression ")" statement
+    #            ( "else" statement )? ;
+    def if_statement(self) -> Stmt:
+        self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        condition = self.expression()
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+        then_branch = self.statement()
+        else_branch = None
+        if self.match(TokenType.ELSE):
+            else_branch = self.statement()
+        return stmt_ast.If(condition, then_branch, else_branch)
 
     # block          → "{" declaration* "}" ;
     def block(self) -> List[Stmt]:

@@ -25,6 +25,13 @@ class Interpreter(expr_ast.ExprVisitor):
     def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
 
+    def visit_if_stmt(self, stmt: stmt_ast.If) -> typing.Any:
+        if self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.then_branch)
+        elif stmt.else_branch is not None:
+            self.execute(stmt.else_branch)
+        return None
+
     def visit_block_stmt(self, stmt: stmt_ast.Block) -> typing.Any:
         self.execute_block(stmt.statements, Environment(self.environment))
         return None
