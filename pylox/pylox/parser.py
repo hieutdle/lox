@@ -5,6 +5,7 @@ import pylox.expr as expr_ast
 from pylox.error import LoxParseError
 from pylox.stmt import Stmt
 import pylox.stmt as stmt_ast
+import typing
 
 
 # recursive descent, top-down parser
@@ -16,6 +17,28 @@ class Parser:
         self.current = 0
         self.errors = []
         self.report_error = report_error
+        self.allow_expressions = False
+        self.found_expression = False
+
+    def parse_repl(self) -> typing.Any:
+        try:
+            self.allow_expressions = True
+            statements: list[Stmt] = []
+            while not self.is_at_end():
+                parsed = self.declaration()
+                if parsed is not None:
+                    statements.append(parsed)
+                if self.found_expression and isinstance(
+                    statements[-1], stmt_ast.Expression
+                ):
+                    last: stmt_ast.Expression = statements[-1]
+                    return last.expression
+                elif self.found_expression:
+                    raise RuntimeError("Unexpected situation -- panic mode")
+            return statements
+        finally:
+            self.allow_expressions = False
+            self.found_expression = False
 
     # program        → declaration * EOF;
     def parse(self) -> list[Stmt]:
@@ -82,7 +105,10 @@ class Parser:
     # exprStmt       → expression ";" ;
     def expression_statement(self) -> Stmt:
         value = self.expression()
-        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        if self.allow_expressions and self.is_at_end():
+            self.found_expression = True
+        else:
+            self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return stmt_ast.Expression(value)
 
     # expression     → assignment;

@@ -2,6 +2,7 @@ import sys
 import typing as t
 from pathlib import Path
 
+from pylox.expr import Expr
 from pylox.scanner import Scanner
 from pylox.error import LoxException, LoxRuntimeError, LoxParseError, LoxSyntaxError
 from pylox.interpreter import Interpreter
@@ -33,13 +34,25 @@ class Lox:
 
     def run_prompt(self) -> None:
         while True:
-            line: str = input("> ")
-            if not line or line.lower() == "exit":
+            line = Prompt.ask("> ")
+            if line == "exit":
                 break
+            try:
+                tokens = Scanner(line).scan_tokens()
+                ast = Parser(tokens, self.report_error).parse_repl()
+                if self.had_error:
+                    continue
 
-            self.run(line)
+                if isinstance(ast, Expr):
+                    print(self.interpreter.interpret_expr(ast))
+                elif isinstance(ast, list):
+                    self.interpreter.interpret(ast)
+            except LoxSyntaxError as e:
+                self.report_error(e)
+            except LoxRuntimeError as e:
+                self.report_runtime_error(e)
 
-            # Reset error flag after each prompt
+            # Reset these so we can stay in the REPL unhindered
             self.had_error = False
             self.had_runtime_error = False
 
@@ -81,7 +94,7 @@ class Lox:
 
     @staticmethod
     def _build_error_string(err: LoxException) -> str:
-        return f"line {err.line + 1}: [bold red]{err.message}[/bold red]"
+        return f"line {err.line}: [bold red]{err.message}[/bold red]"
 
     def report_error(self, err: LoxException) -> None:
         print(self._build_error_string(err))
