@@ -76,17 +76,28 @@ class Parser:
 
     # statement  → exprStmt
     #            | ifStmt
-    #            | printStmt ;
+    #            | printStmt
+    #            | whileStmt
     #            | block ;
     def statement(self) -> Stmt:
         if self.match(TokenType.IF):
             return self.if_statement()
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        if self.match(TokenType.WHILE):
+            return self.while_statement()
         if self.match(TokenType.LEFT_BRACE):
             return stmt_ast.Block(self.block())
 
         return self.expression_statement()
+
+    # whileStmt      → "while" "(" expression ")" statement ;
+    def while_statement(self) -> Stmt:
+        self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        condition = self.expression()
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
+        body = self.statement()
+        return stmt_ast.While(condition, body)
 
     # ifStmt         → "if" "(" expression ")" statement
     #            ( "else" statement )? ;
@@ -101,8 +112,8 @@ class Parser:
         return stmt_ast.If(condition, then_branch, else_branch)
 
     # block          → "{" declaration* "}" ;
-    def block(self) -> List[Stmt]:
-        stmts: List[Stmt] = []
+    def block(self) -> typing.List[Stmt]:
+        stmts: typing.List[Stmt] = []
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
             result = self.declaration()
             if result is not None:
@@ -130,9 +141,9 @@ class Parser:
         return self.assignment()
 
     # assignment     → IDENTIFIER "=" assignment
-    #                | equality ;
+    #                | logic_or ;
     def assignment(self) -> Expr:
-        expr = self.equality()
+        expr = self.or_expression()
         if self.match(TokenType.EQUAL):
             equals = self.previous()
             value = self.assignment()
@@ -141,6 +152,25 @@ class Parser:
                 return expr_ast.Assign(name, value)
             else:
                 self.error(equals, "Invalid assignment target.")
+        return expr
+
+    # logic_or       → logic_and ( "or" logic_and )* ;
+
+    def or_expression(self) -> Expr:
+        expr = self.and_expression()
+        while self.match(TokenType.OR):
+            op = self.previous()
+            right = self.and_expression()
+            expr = expr_ast.Logical(expr, op, right)
+        return expr
+
+    # logic_and      → equality ( "and" equality )* ;
+    def and_expression(self) -> Expr:
+        expr = self.equality()
+        while self.match(TokenType.AND):
+            op = self.previous()
+            right = self.equality()
+            expr = expr_ast.Logical(expr, op, right)
         return expr
 
     # equality       → comparison ( ( "!=" | "==" ) comparison )* ;

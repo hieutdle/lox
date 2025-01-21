@@ -56,7 +56,7 @@ class Lox:
             self.had_error = False
             self.had_runtime_error = False
 
-    def run_file(self, filename: str) -> None:
+    def run_file(self, filename) -> None:
         with open(filename, encoding="utf-8") as f:
             content: str = f.read()
         self.run(content)

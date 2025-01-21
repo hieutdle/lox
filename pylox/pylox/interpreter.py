@@ -8,7 +8,7 @@ from pylox.stmt import Stmt
 from pylox.environment import Environment
 
 
-class Interpreter(expr_ast.ExprVisitor):
+class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
     def __init__(self):
         self.environment = Environment()
 
@@ -24,6 +24,21 @@ class Interpreter(expr_ast.ExprVisitor):
 
     def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
+
+    def visit_logical_expr(self, expr: expr_ast.Logical) -> typing.Any:
+        left = self.evaluate(expr.left)
+        if expr.operator.token_type == TokenType.OR:
+            if self.is_truthy(left):
+                return left
+        elif expr.operator.token_type == TokenType.AND:
+            if not self.is_truthy(left):
+                return left
+        return self.evaluate(expr.right)
+
+    def visit_while_stmt(self, stmt: stmt_ast.While) -> typing.Any:
+        while self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.body)
+        return None
 
     def visit_if_stmt(self, stmt: stmt_ast.If) -> typing.Any:
         if self.is_truthy(self.evaluate(stmt.condition)):

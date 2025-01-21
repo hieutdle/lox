@@ -71,6 +71,7 @@ if __name__ == "__main__":
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : object value",
+            "Logical  : Expr left, Token operator, Expr right",
             "Unary    : Token operator, Expr right",
             "Variable : Token name",
         ],
@@ -84,5 +85,6 @@ if __name__ == "__main__":
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, typing.Optional[Expr] initializer",
+            "While      : Expr condition, Stmt body",
         ],
     )
