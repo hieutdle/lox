@@ -32,19 +32,22 @@ def define_ast(output_dir, base_name, types):
         f.write("        pass\n\n")
         for expr_type in types:
             class_name = expr_type.split(":")[0].strip()
-            fields = expr_type.split(":")[1].strip()
-            field_list = fields.split(", ")
+            fields = expr_type.split(":")[1].strip() if ":" in expr_type else ""
 
-            # Generate the class definition with lowercase parameter names
             f.write(f"class {class_name}({base_name}):\n")
-            params = ", ".join(
-                f"{field.split(' ')[1].lower()}: {field.split(' ')[0]}"
-                for field in field_list
-            )
-            f.write(f"    def __init__(self, {params}):\n")
-            for field in field_list:
-                name = field.split(" ")[1].lower()
-                f.write(f"        self.{name} = {name}\n")
+            if fields:  # If there are fields, generate a constructor
+                field_list = fields.split(", ")
+                params = ", ".join(
+                    f"{field.split(' ')[1].lower()}: {field.split(' ')[0]}"
+                    for field in field_list
+                )
+                f.write(f"    def __init__(self, {params}):\n")
+                for field in field_list:
+                    name = field.split(" ")[1].lower()
+                    f.write(f"        self.{name} = {name}\n")
+            else:  # No fields, so generate a default constructor
+                f.write("    def __init__(self):\n")
+                f.write("        super().__init__()\n")
 
             f.write(
                 f"\n    def accept(self, visitor: {base_name}Visitor) -> typing.Any:\n"
@@ -86,5 +89,6 @@ if __name__ == "__main__":
             "Print      : Expr expression",
             "Var        : Token name, typing.Optional[Expr] initializer",
             "While      : Expr condition, Stmt body",
+            "Break",
         ],
     )

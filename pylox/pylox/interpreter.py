@@ -1,7 +1,7 @@
 import pylox.expr as expr_ast
 import pylox.stmt as stmt_ast
 import typing
-from pylox.error import LoxRuntimeError
+from pylox.error import LoxRuntimeError, BreakException
 from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 from pylox.stmt import Stmt
@@ -36,9 +36,14 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
         return self.evaluate(expr.right)
 
     def visit_while_stmt(self, stmt: stmt_ast.While) -> typing.Any:
-        while self.is_truthy(self.evaluate(stmt.condition)):
-            self.execute(stmt.body)
-        return None
+        try:
+            while self.is_truthy(self.evaluate(stmt.condition)):
+                self.execute(stmt.body)
+        except BreakException:
+            pass  # Do nothing.
+
+    def visit_break_stmt(self, stmt) -> typing.Any:
+        raise BreakException()
 
     def visit_if_stmt(self, stmt: stmt_ast.If) -> typing.Any:
         if self.is_truthy(self.evaluate(stmt.condition)):

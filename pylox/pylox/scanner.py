@@ -21,6 +21,7 @@ class Scanner:
         "true": TokenType.TRUE,
         "var": TokenType.VAR,
         "while": TokenType.WHILE,
+        "break": TokenType.BREAK,
     }
 
     def __init__(self, source: str):
@@ -167,7 +168,7 @@ class Scanner:
                 self.advance()
 
             # Convert the lexeme to a float and add it as a token
-            value: float = float(self.source[self.start : self.current])
+            value: float = float(self.source[self.start : self.current])  # type: ignore
             self.add_token(TokenType.NUMBER, value)
         else:
             # Convert the lexeme to an int and add it as a token

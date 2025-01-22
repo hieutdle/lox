@@ -25,3 +25,7 @@ class LoxRuntimeError(LoxException):
     def __init__(self, token: Token, message: str) -> None:
         self.line = token.line
         self.message = message
+
+
+class BreakException(RuntimeError):
+    pass

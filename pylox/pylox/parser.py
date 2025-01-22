@@ -19,6 +19,7 @@ class Parser:
         self.report_error = report_error
         self.allow_expressions = False
         self.found_expression = False
+        self.loop_depth = 0
 
     def parse_repl(self) -> typing.Any:
         try:
@@ -90,8 +91,18 @@ class Parser:
             return stmt_ast.Block(self.block())
         if self.match(TokenType.FOR):
             return self.for_statement()
+        if self.match(TokenType.BREAK):
+            return self.break_statement()
 
         return self.expression_statement()
+
+    # break -> 'break' ;
+    def break_statement(self) -> Stmt:
+        if self.loop_depth == 0:
+            self.error(self.previous(), "Must be inside a loop to use 'break'.")
+
+        self.consume(TokenType.SEMICOLON, "Expect ';' after 'break'.")
+        return stmt_ast.Break()
 
     # forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
     #                  expression? ";"
@@ -113,23 +124,36 @@ class Parser:
         if not self.check(TokenType.RIGHT_PAREN):
             increment = self.expression()
         self.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
-        body = self.statement()
-        if increment is not None:
-            body = stmt_ast.Block([body, stmt_ast.Expression(increment)])
-        if condition is None:
-            condition = expr_ast.Literal(True)
-        result: stmt_ast.While | stmt_ast.Block = stmt_ast.While(condition, body)
-        if initializer is not None:
-            result = stmt_ast.Block([initializer, result])
-        return result
+
+        try:
+            self.loop_depth += 1
+            body = self.statement()
+
+            if increment is not None:
+                body = stmt_ast.Block([body, stmt_ast.Expression(increment)])
+
+            if condition is None:
+                condition = expr_ast.Literal(True)
+
+            result: stmt_ast.While | stmt_ast.Block = stmt_ast.While(condition, body)
+            if initializer is not None:
+                result = stmt_ast.Block([initializer, result])
+
+            return result
+        finally:
+            self.loop_depth -= 1
 
     # whileStmt      → "while" "(" expression ")" statement ;
     def while_statement(self) -> Stmt:
         self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
         condition = self.expression()
         self.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
-        body = self.statement()
-        return stmt_ast.While(condition, body)
+        try:
+            self.loop_depth += 1
+            body = self.statement()
+            return stmt_ast.While(condition, body)
+        finally:
+            self.loop_depth -= 1
 
     # ifStmt         → "if" "(" expression ")" statement
     #            ( "else" statement )? ;
@@ -377,6 +401,7 @@ class Parser:
                     TokenType.WHILE,
                     TokenType.PRINT,
                     TokenType.RETURN,
+                    TokenType.BREAK,
                 ):
                     return
 
