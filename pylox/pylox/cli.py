@@ -56,7 +56,7 @@ class Lox:
             self.had_error = False
             self.had_runtime_error = False
 
-    def run_file(self, filename) -> None:
+    def run_file(self, filename: str) -> None:
         with open(filename, encoding="utf-8") as f:
             content: str = f.read()
         self.run(content)
@@ -114,4 +114,4 @@ def main(
     if not lox_script:
         lox.run_prompt()
     else:
-        lox.run_file(lox_script)
+        lox.run_file(str(lox_script))

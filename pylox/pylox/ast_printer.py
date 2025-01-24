@@ -7,16 +7,16 @@ class AstPrinter(ExprVisitor):
     def print(self, expr: Expr) -> str:
         return expr.accept(self)
 
-    def visit_call_expr(self, expr) -> typing.Any:
+    def visit_call_expr(self, expr: Expr) -> typing.Any:
         pass
 
-    def visit_logical_expr(self, expr) -> typing.Any:
+    def visit_logical_expr(self, expr: Expr) -> typing.Any:
         pass
 
-    def visit_assign_expr(self, expr) -> typing.Any:
+    def visit_assign_expr(self, expr: Expr) -> typing.Any:
         pass
 
-    def visit_variable_expr(self, expr) -> typing.Any:
+    def visit_variable_expr(self, expr: Expr) -> typing.Any:
         pass
 
     def visit_binary_expr(self, expr: Binary) -> str:
@@ -45,16 +45,16 @@ class AstPrinter(ExprVisitor):
 # Define a visitor class for our syntax tree classes that takes an expression,
 # converts it to RPN, and returns the resulting string.
 class RpnAstPrinter(ExprVisitor):
-    def visit_call_expr(self, expr) -> typing.Any:
+    def visit_call_expr(self, expr: Expr) -> typing.Any:
         pass
 
-    def visit_logical_expr(self, expr) -> typing.Any:
+    def visit_logical_expr(self, expr: Expr) -> typing.Any:
         pass
 
-    def visit_assign_expr(self, expr) -> typing.Any:
+    def visit_assign_expr(self, expr: Expr) -> typing.Any:
         pass
 
-    def visit_variable_expr(self, expr) -> typing.Any:
+    def visit_variable_expr(self, expr: Expr) -> typing.Any:
         pass
 
     def print_expr(self, expr: Expr):
