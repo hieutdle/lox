@@ -58,6 +58,8 @@ class Parser:
         try:
             if self.match(TokenType.VAR):
                 return self.var_declaration()
+            if self.match(TokenType.FUN):
+                return self.function("function")
             return self.statement()
         except LoxParseError:
             self.synchronize()
@@ -74,6 +76,27 @@ class Parser:
         self.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
 
         return stmt_ast.Var(name, initializer)
+
+    # funDecl        → "fun" function ;
+    # function       → IDENTIFIER "(" parameters? ")" block ;
+    # parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+    def function(self, kind: str) -> Stmt:
+        name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name")
+        self.consume(TokenType.LEFT_PAREN, f'Expect "(" after {kind} name')
+        parameters: typing.List[Token] = []
+        if not self.check(TokenType.RIGHT_PAREN):
+            is_comma = True
+            while is_comma:
+                if len(parameters) >= 255:
+                    raise self.error(self.peek(), "Can't have more than 255 arguments.")
+                parameters.append(
+                    self.consume(TokenType.IDENTIFIER, "Expect parameter name")
+                )
+                is_comma = self.match(TokenType.COMMA)
+        self.consume(TokenType.RIGHT_PAREN, 'Expect ")" after parameters')
+        self.consume(TokenType.LEFT_BRACE, f'Expect "{{" before {kind} body')
+        body = self.block()
+        return stmt_ast.Function(name, parameters, body)
 
     # statement  → exprStmt
     #            | ifStmt

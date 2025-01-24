@@ -36,6 +36,10 @@ class StmtVisitor(ABC):
     def visit_break_stmt(self, stmt) -> typing.Any:
         pass
 
+    @abstractmethod
+    def visit_function_stmt(self, stmt) -> typing.Any:
+        pass
+
 
 class Stmt(ABC):
     @abstractmethod
@@ -94,4 +98,13 @@ class Break(Stmt):
 
     def accept(self, visitor: StmtVisitor) -> typing.Any:
         return visitor.visit_break_stmt(self)
+
+class Function(Stmt):
+    def __init__(self, name: Token, params: typing.List[Token], body: typing.List[Stmt]):
+        self.name = name
+        self.params = params
+        self.body = body
+
+    def accept(self, visitor: StmtVisitor) -> typing.Any:
+        return visitor.visit_function_stmt(self)
 
