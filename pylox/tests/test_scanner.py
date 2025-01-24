@@ -9,7 +9,7 @@ def test_normal_input():
     input = """var five = 5;
     var ten = 10;
 
-    5 < 10 > 5;
+    5 <= 10 > 5;
 
     if (5 < 10) {
         return true;
@@ -33,7 +33,7 @@ def test_normal_input():
         (TokenType.NUMBER, "10"),
         (TokenType.SEMICOLON, ";"),
         (TokenType.NUMBER, "5"),
-        (TokenType.LESS, "<"),
+        (TokenType.LESS_EQUAL, "<="),
         (TokenType.NUMBER, "10"),
         (TokenType.GREATER, ">"),
         (TokenType.NUMBER, "5"),

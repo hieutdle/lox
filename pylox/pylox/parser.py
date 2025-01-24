@@ -102,6 +102,7 @@ class Parser:
     #            | ifStmt
     #            | printStmt
     #            | whileStmt
+    #            | returnStmt
     #            | block ;
     def statement(self) -> Stmt:
         if self.match(TokenType.IF):
@@ -112,6 +113,8 @@ class Parser:
             return self.while_statement()
         if self.match(TokenType.LEFT_BRACE):
             return stmt_ast.Block(self.block())
+        if self.match(TokenType.RETURN):
+            return self.return_statement()
         if self.match(TokenType.FOR):
             return self.for_statement()
         if self.match(TokenType.BREAK):
@@ -177,6 +180,14 @@ class Parser:
             return stmt_ast.While(condition, body)
         finally:
             self.loop_depth -= 1
+
+    def return_statement(self) -> Stmt:
+        keyword = self.previous()
+        value = None
+        if not self.check(TokenType.SEMICOLON):
+            value = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after return value.")
+        return stmt_ast.Return(keyword, value)
 
     # ifStmt         → "if" "(" expression ")" statement
     #            ( "else" statement )? ;

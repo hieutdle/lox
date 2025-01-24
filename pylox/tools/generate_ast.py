@@ -91,6 +91,7 @@ if __name__ == "__main__":
             "Var        : Token name, typing.Optional[Expr] initializer",
             "While      : Expr condition, Stmt body",
             "Break",
-            "Function  : Token name, typing.List[Token] params, typing.List[Stmt] body",
+            "Function   : Token name, typing.List[Token] params, typing.List[Stmt] body",
+            "Return     : Token keyword, typing.Optional[Expr] value",
         ],
     )

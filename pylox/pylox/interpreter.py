@@ -6,7 +6,7 @@ from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 from pylox.stmt import Stmt
 from pylox.environment import Environment
-from pylox.runtime_object import LoxCallable, LoxFunction
+from pylox.runtime_object import LoxCallable, LoxFunction, Return
 from pylox.builtin_function import FUNCTIONS_MAPPING
 
 
@@ -32,6 +32,12 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
 
     def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
+
+    def visit_return_stmt(self, stmt: stmt_ast.Return) -> typing.Any:
+        value = None
+        if stmt.value is not None:
+            value = self.evaluate(stmt.value)
+        raise Return(value)
 
     def visit_function_stmt(self, stmt: stmt_ast.Function) -> typing.Any:
         function = LoxFunction(stmt)
@@ -159,6 +165,7 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
                 return float(left) < float(right)
             case TokenType.LESS_EQUAL:
                 self.check_number_operands(expr.operator, left, right)
+                return float(left) <= float(right)
             case TokenType.MINUS:
                 self.check_number_operands(expr.operator, left, right)
                 return float(left) - float(right)
