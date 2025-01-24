@@ -180,7 +180,7 @@ class Parser:
     # printStmt      → "print" expression ";" ;
     def print_statement(self) -> Stmt:
         value = self.expression()
-        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        self.consume(TokenType.SEMICOLON, "printStmt: Expect ';' after value.")
         return stmt_ast.Print(value)
 
     # exprStmt       → expression ";" ;
@@ -189,7 +189,7 @@ class Parser:
         if self.allow_expressions and self.is_at_end():
             self.found_expression = True
         else:
-            self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+            self.consume(TokenType.SEMICOLON, "exprStmt: Expect ';' after value.")
         return stmt_ast.Expression(value)
 
     # expression     → assignment;
@@ -286,7 +286,7 @@ class Parser:
             right = self.unary()
             return expr_ast.Unary(op, right)
 
-        return self.primary()
+        return self.call()
 
     # call           → primary ( "(" arguments? ")" )* ;
     def call(self) -> Expr:

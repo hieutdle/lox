@@ -1,11 +1,10 @@
 import time
 from typing import Dict, Any
-from pylox.interpreter import Interpreter
 from pylox.runtime_object import LoxCallable
 
 
 class Clock(LoxCallable):
-    def call(self, interpreter: Interpreter, args: Any) -> Any:
+    def call(self, interpreter, args: Any) -> Any:
         return time.time()
 
     def arity(self) -> int:
@@ -13,7 +12,7 @@ class Clock(LoxCallable):
 
 
 class Input(LoxCallable):
-    def call(self, interpreter: Interpreter, args: Any) -> Any:
+    def call(self, interpreter, args: Any) -> Any:
         return input()
 
     def arity(self) -> int:
@@ -21,7 +20,7 @@ class Input(LoxCallable):
 
 
 class Len(LoxCallable):
-    def call(self, interpreter: Interpreter, args: Any) -> Any:
+    def call(self, interpreter, args: Any) -> Any:
         return len(args[0])
 
     def arity(self) -> int:
