@@ -6,11 +6,19 @@ from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 from pylox.stmt import Stmt
 from pylox.environment import Environment
+from pylox.runtime_object import LoxCallable
+from pylox.builtin_function import FUNCTIONS_MAPPING
 
 
 class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
     def __init__(self):
-        self.environment = Environment()
+        self.globals = Environment()
+        self.environment = self.globals
+        self.init_standard_library()
+
+    def init_standard_library(self):
+        for name, func in FUNCTIONS_MAPPING.items():
+            self.globals.define(name, func)
 
     def interpret(self, statements: list[Stmt]):
         for statement in statements:
@@ -24,6 +32,20 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
 
     def evaluate(self, expr: Expr) -> typing.Any:
         return expr.accept(self)
+
+    def visit_call_expr(self, expr: expr_ast.Call) -> typing.Any:
+        callee = self.evaluate(expr.callee)
+        arguments: list = []
+        for arg in expr.arguments:
+            arguments.append(self.evaluate(arg))
+        if not isinstance(callee, LoxCallable):
+            raise LoxRuntimeError(expr.paren, "Can only call functions and classes.")
+        if len(arguments) != callee.arity():
+            raise LoxRuntimeError(
+                expr.paren,
+                f"Expected {callee.arity()} arguments but got {len(arguments)}.",
+            )
+        return callee.call(self, arguments)
 
     def visit_logical_expr(self, expr: expr_ast.Logical) -> typing.Any:
         left = self.evaluate(expr.left)

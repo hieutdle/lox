@@ -279,7 +279,7 @@ class Parser:
 
         return expr
 
-    # unary          → ( "!" | "-" ) unary | primary ;
+    # unary          → ( "!" | "-" ) unary | call ;
     def unary(self) -> Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
             op = self.previous()
@@ -287,6 +287,29 @@ class Parser:
             return expr_ast.Unary(op, right)
 
         return self.primary()
+
+    # call           → primary ( "(" arguments? ")" )* ;
+    def call(self) -> Expr:
+        expr = self.primary()
+        while True:
+            if self.match(TokenType.LEFT_PAREN):
+                expr = self.parse_arguments(expr)
+            else:
+                break
+        return expr
+
+    # arguments      → expression ( "," expression )* ;
+    def parse_arguments(self, callee: Expr) -> Expr:
+        arguments: typing.List[Expr] = []
+        if not self.check(TokenType.RIGHT_PAREN):
+            is_comma = True
+            while is_comma:
+                if len(arguments) >= 255:
+                    raise self.error(self.peek(), "Can't have more than 255 arguments.")
+                arguments.append(self.expression())
+                is_comma = self.match(TokenType.COMMA)
+        paren = self.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+        return expr_ast.Call(callee, paren, arguments)
 
     # primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
     def primary(self) -> Expr:
