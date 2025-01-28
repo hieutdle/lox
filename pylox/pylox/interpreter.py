@@ -6,7 +6,7 @@ from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 from pylox.stmt import Stmt
 from pylox.environment import Environment
-from pylox.runtime_object import LoxCallable, LoxClass, LoxFunction, Return
+from pylox.runtime_object import LoxCallable, LoxClass, LoxFunction, LoxInstance, Return
 from pylox.builtin_function import FUNCTIONS_MAPPING
 
 
@@ -24,6 +24,20 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
     def resolve(self, expr: Expr, depth: int) -> None:
         self.locals[expr] = depth
 
+    def visit_get_expr(self, expr: expr_ast.Get) -> typing.Any:
+        obj = self.evaluate(expr.obj)
+        if isinstance(obj, LoxInstance):
+            return typing.cast(LoxInstance, obj).get(expr.name)
+        raise LoxRuntimeError(expr.name, "Only instances have properties.")
+
+    def visit_set_expr(self, expr: expr_ast.Set) -> typing.Any:
+        obj = self.evaluate(expr.obj)
+        if not isinstance(obj, LoxInstance):
+            raise LoxRuntimeError(expr.name, "Only instances have fields.")
+        value = self.evaluate(expr.value)
+        typing.cast(LoxInstance, obj).set(expr.name, value)
+        return value
+
     def interpret(self, statements: list[Stmt]) -> None:
         for statement in statements:
             self.execute(statement)
@@ -39,8 +53,13 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
 
     def visit_class_stmt(self, stmt: stmt_ast.Class) -> typing.Any:
         self.environment.define(stmt.name.lexeme, None)
-        lox_class = LoxClass(stmt.name.lexeme)
+        methods: typing.Dict[str, LoxFunction] = {}
+        for method in stmt.methods:
+            function = LoxFunction(method, self.environment)
+            methods[method.name.lexeme] = function
+        lox_class = LoxClass(stmt.name.lexeme, methods)
         self.environment.assign(stmt.name, lox_class)
+
         return None
 
     def visit_return_stmt(self, stmt: stmt_ast.Return) -> typing.Any:

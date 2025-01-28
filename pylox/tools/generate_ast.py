@@ -78,6 +78,8 @@ if __name__ == "__main__":
             "Unary    : Token operator, Expr right",
             "Variable : Token name",
             "Call     : Expr callee, Token paren, typing.List[Expr] arguments",
+            "Get      : Expr obj, Token name",
+            "Set      : Expr obj, Token name, Expr value",
         ],
     )
     define_ast(

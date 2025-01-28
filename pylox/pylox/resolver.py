@@ -8,9 +8,11 @@ from pylox.expr import (
     Call,
     Expr,
     ExprVisitor,
+    Get,
     Grouping,
     Literal,
     Logical,
+    Set,
     Unary,
     Variable,
 )
@@ -33,7 +35,8 @@ from pylox.tokens import Token
 
 class FunctionType(Enum):
     NONE = (auto(),)
-    FUNCTION = auto()
+    FUNCTION = (auto(),)
+    METHOD = auto()
 
 
 class Resolver(ExprVisitor, StmtVisitor):
@@ -42,9 +45,21 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.scopes: typing.List[typing.Dict[str, bool]] = []
         self.current_function = FunctionType.NONE
 
+    def visit_get_expr(self, expr: Get) -> typing.Any:
+        self.resolve_ast_node(expr.obj)
+        return None
+
+    def visit_set_expr(self, expr: Set) -> typing.Any:
+        self.resolve_ast_node(expr.value)
+        self.resolve_ast_node(expr.obj)
+        return None
+
     def visit_class_stmt(self, stmt: Class) -> typing.Any:
         self.declare(stmt.name)
         self.define(stmt.name)
+        for method in stmt.methods:
+            declaration = FunctionType.METHOD
+            self.resolve_function(method, declaration)
         return None
 
     def visit_var_stmt(self, stmt: Var) -> typing.Any:

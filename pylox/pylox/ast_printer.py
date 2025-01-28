@@ -19,6 +19,12 @@ class AstPrinter(ExprVisitor):
     def visit_variable_expr(self, expr: Expr) -> typing.Any:
         pass
 
+    def visit_get_expr(self, expr) -> typing.Any:
+        pass
+
+    def visit_set_expr(self, expr) -> typing.Any:
+        pass
+
     def visit_binary_expr(self, expr: Binary) -> str:
         return self.parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
@@ -45,6 +51,12 @@ class AstPrinter(ExprVisitor):
 # Define a visitor class for our syntax tree classes that takes an expression,
 # converts it to RPN, and returns the resulting string.
 class RpnAstPrinter(ExprVisitor):
+    def visit_get_expr(self, expr) -> typing.Any:
+        pass
+
+    def visit_set_expr(self, expr) -> typing.Any:
+        pass
+
     def visit_call_expr(self, expr: Expr) -> typing.Any:
         pass
 
