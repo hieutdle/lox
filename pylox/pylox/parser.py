@@ -1,4 +1,4 @@
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, cast
 from pylox.tokens import Token, TokenType
 from pylox.expr import Expr
 import pylox.expr as expr_ast
@@ -32,7 +32,9 @@ class Parser:
                 if self.found_expression and isinstance(
                     statements[-1], stmt_ast.Expression
                 ):
-                    last: stmt_ast.Expression = statements[-1]
+                    last: stmt_ast.Expression = cast(
+                        stmt_ast.Expression, statements[-1]
+                    )
                     return last.expression
                 elif self.found_expression:
                     raise RuntimeError("Unexpected situation -- panic mode")
@@ -51,8 +53,10 @@ class Parser:
 
         return statements
 
-    # declaration → varDecl
-    #             | statement ;
+    # declaration    → varDecl
+    #                | funDecl
+    #                | classDecl
+    #                | statement;
 
     def declaration(self) -> Optional[Stmt]:
         try:
@@ -60,10 +64,22 @@ class Parser:
                 return self.var_declaration()
             if self.match(TokenType.FUN):
                 return self.function("function")
+            if self.match(TokenType.CLASS):
+                return self.class_declaration()
             return self.statement()
         except LoxParseError:
             self.synchronize()
             return None
+
+    # classDecl      → "class" IDENTIFIER "{" function* "}" ;
+    def class_declaration(self) -> Stmt:
+        name = self.consume(TokenType.IDENTIFIER, "Expect class name")
+        self.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+        methods: typing.List[stmt_ast.Function] = []
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            methods.append(self.function("method"))
+        self.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
+        return stmt_ast.Class(name, methods)
 
     # varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
     def var_declaration(self) -> Stmt:
@@ -80,7 +96,7 @@ class Parser:
     # funDecl        → "fun" function ;
     # function       → IDENTIFIER "(" parameters? ")" block ;
     # parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
-    def function(self, kind: str) -> Stmt:
+    def function(self, kind: str) -> stmt_ast.Function:
         name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name")
         self.consume(TokenType.LEFT_PAREN, f'Expect "(" after {kind} name')
         parameters: typing.List[Token] = []

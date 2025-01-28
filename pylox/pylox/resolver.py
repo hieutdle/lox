@@ -17,6 +17,7 @@ from pylox.expr import (
 from pylox.interpreter import Interpreter
 from pylox.stmt import (
     Block,
+    Class,
     Expression,
     Function,
     If,
@@ -40,6 +41,11 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.interpreter = interpreter
         self.scopes: typing.List[typing.Dict[str, bool]] = []
         self.current_function = FunctionType.NONE
+
+    def visit_class_stmt(self, stmt: Class) -> typing.Any:
+        self.declare(stmt.name)
+        self.define(stmt.name)
+        return None
 
     def visit_var_stmt(self, stmt: Var) -> typing.Any:
         self.declare(stmt.name)

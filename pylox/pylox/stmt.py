@@ -44,6 +44,10 @@ class StmtVisitor(ABC):
     def visit_return_stmt(self, stmt) -> typing.Any:
         pass
 
+    @abstractmethod
+    def visit_class_stmt(self, stmt) -> typing.Any:
+        pass
+
 
 class Stmt(ABC):
     @abstractmethod
@@ -119,4 +123,12 @@ class Return(Stmt):
 
     def accept(self, visitor: StmtVisitor) -> typing.Any:
         return visitor.visit_return_stmt(self)
+
+class Class(Stmt):
+    def __init__(self, name: Token, methods: typing.List[Function]):
+        self.name = name
+        self.methods = methods
+
+    def accept(self, visitor: StmtVisitor) -> typing.Any:
+        return visitor.visit_class_stmt(self)
 

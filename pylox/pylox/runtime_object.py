@@ -14,6 +14,14 @@ class LoxCallable(ABC):
         pass
 
 
+class LoxClass:
+    def __init__(self, name: str):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
 class LoxFunction(LoxCallable):
     def __init__(self, declaration: Function, closure: Environment):
         self.declaration = declaration

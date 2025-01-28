@@ -93,5 +93,6 @@ if __name__ == "__main__":
             "Break",
             "Function   : Token name, typing.List[Token] params, typing.List[Stmt] body",
             "Return     : Token keyword, typing.Optional[Expr] value",
+            "Class      : Token name, typing.List[Function] methods",
         ],
     )
