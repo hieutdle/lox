@@ -3,6 +3,7 @@ import typing as t
 from pathlib import Path
 
 from pylox.expr import Expr
+from pylox.resolver import Resolver
 from pylox.scanner import Scanner
 from pylox.error import LoxException, LoxRuntimeError, LoxParseError, LoxSyntaxError
 from pylox.interpreter import Interpreter
@@ -46,8 +47,10 @@ class Lox:
                 if isinstance(ast, Expr):
                     print(self.interpreter.interpret_expr(ast))
                 elif isinstance(ast, list):
+                    resolver = Resolver(self.interpreter)
+                    resolver.resolve(ast)
                     self.interpreter.interpret(ast)
-            except LoxSyntaxError as e:
+            except (LoxSyntaxError, LoxParseError) as e:
                 self.report_error(e)
             except LoxRuntimeError as e:
                 self.report_runtime_error(e)

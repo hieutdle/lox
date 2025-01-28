@@ -15,19 +15,23 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
         self.globals = Environment()
         self.environment = self.globals
         self.init_standard_library()
+        self.locals: typing.Dict[Expr, int] = {}
 
-    def init_standard_library(self):
+    def init_standard_library(self) -> None:
         for name, func in FUNCTIONS_MAPPING.items():
             self.globals.define(name, func)
 
-    def interpret(self, statements: list[Stmt]):
+    def resolve(self, expr: Expr, depth: int) -> None:
+        self.locals[expr] = depth
+
+    def interpret(self, statements: list[Stmt]) -> None:
         for statement in statements:
             self.execute(statement)
 
     def interpret_expr(self, expr: Expr) -> str:
         return self.stringify(self.evaluate(expr))
 
-    def execute(self, stmt: Stmt):
+    def execute(self, stmt: Stmt) -> None:
         stmt.accept(self)
 
     def evaluate(self, expr: Expr) -> typing.Any:
@@ -44,6 +48,9 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
         self.environment.define(stmt.name.lexeme, function)
         return None
 
+    # It stores the callee expression and a list of expressions for the arguments.
+    # It also stores the token for the closing parenthesis.
+    # We’ll use that token’s location when we report a runtime error caused by a function call.
     def visit_call_expr(self, expr: expr_ast.Call) -> typing.Any:
         callee = self.evaluate(expr.callee)
         arguments: list = []
@@ -107,11 +114,22 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
 
     def visit_assign_expr(self, expr: expr_ast.Assign) -> typing.Any:
         value = self.evaluate(expr.value)
-        self.environment.assign(expr.name, value)
+        distance = self.locals.get(expr)
+        if distance is not None:
+            self.environment.assign_at(distance, expr.name, value)
+        else:
+            self.globals.assign(expr.name, value)
         return value
 
     def visit_variable_expr(self, expr: expr_ast.Variable) -> typing.Any:
-        return self.environment.get(expr.name)
+        return self.lookup_variable(expr.name, expr)
+
+    def lookup_variable(self, name: Token, expr: Expr) -> typing.Any:
+        distance = self.locals.get(expr)
+        if distance is not None:
+            return self.environment.get_at(distance, name.lexeme)
+        else:
+            return self.globals.get(name)
 
     def visit_expression_stmt(self, stmt: stmt_ast.Expression) -> typing.Any:
         self.evaluate(stmt.expression)

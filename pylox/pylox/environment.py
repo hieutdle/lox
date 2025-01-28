@@ -4,9 +4,9 @@ from pylox.tokens import Token
 
 
 class Environment:
-    def __init__(self, enclosing=None) -> None:
+    def __init__(self, enclosing: typing.Optional["Environment"] = None):
         self._values: dict[str, typing.Any] = {}
-        self._enclosing = enclosing
+        self._enclosing: typing.Optional["Environment"] = enclosing
 
     def define(self, name: str, value: typing.Any) -> None:
         self._values[name] = value
@@ -30,3 +30,16 @@ class Environment:
             return
 
         raise LoxRuntimeError(name, f"Undefined variable {name.lexeme}.")
+
+    def get_at(self, distance: int, name: str) -> typing.Any:
+        return self.ancestor(distance)._values.get(name)
+
+    def assign_at(self, distance: int, name: Token, value: typing.Any) -> typing.Any:
+        self.ancestor(distance)._values[name.lexeme] = value
+
+    def ancestor(self, distance: int) -> typing.Any:
+        env = self
+        while distance > 0:
+            env = env._enclosing  # type: ignore
+            distance -= 1
+        return env
