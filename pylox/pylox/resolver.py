@@ -1,3 +1,4 @@
+from enum import Enum, auto
 import typing
 
 from pylox.error import LoxParseError
@@ -29,10 +30,16 @@ from pylox.stmt import (
 from pylox.tokens import Token
 
 
+class FunctionType(Enum):
+    NONE = (auto(),)
+    FUNCTION = auto()
+
+
 class Resolver(ExprVisitor, StmtVisitor):
     def __init__(self, interpreter: Interpreter):
         self.interpreter = interpreter
         self.scopes: typing.List[typing.Dict[str, bool]] = []
+        self.current_function = FunctionType.NONE
 
     def visit_var_stmt(self, stmt: Var) -> typing.Any:
         self.declare(stmt.name)
@@ -82,7 +89,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         # before resolving the function’s body.
         # This lets a function recursively refer to itself inside its own body.
         self.define(stmt.name)
-        self.resolve_function(stmt)
+        self.resolve_function(stmt, FunctionType.FUNCTION)
         return None
 
     def visit_binary_expr(self, expr: Binary) -> typing.Any:
@@ -100,17 +107,22 @@ class Resolver(ExprVisitor, StmtVisitor):
         return None
 
     def visit_return_stmt(self, stmt: Return) -> typing.Any:
+        if self.current_function is FunctionType.NONE:
+            raise LoxParseError(stmt.keyword, "Can't return from top-level code.")
         if stmt.value is not None:
             self.resolve_ast_node(stmt.value)
         return None
 
-    def resolve_function(self, function: Function) -> None:
+    def resolve_function(self, function: Function, fun_type: FunctionType) -> None:
+        parent_fun = self.current_function
+        self.current_function = fun_type
         self.begin_scope()
         for param in function.params:
             self.declare(param)
             self.define(param)
         self.resolve(function.body)
         self.end_scope()
+        self.current_function = parent_fun
 
     def visit_expression_stmt(self, stmt: Expression) -> typing.Any:
         self.resolve_ast_node(stmt.expression)
