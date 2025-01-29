@@ -422,6 +422,9 @@ class Parser:
             self.factor()
             raise err
 
+        if self.match(TokenType.THIS):
+            return expr_ast.This(self.previous())
+
         raise self.error(self.peek(), "Expect expression")
 
     # helpers

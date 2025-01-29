@@ -13,6 +13,7 @@ from pylox.expr import (
     Literal,
     Logical,
     Set,
+    This,
     Unary,
     Variable,
 )
@@ -45,6 +46,10 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.scopes: typing.List[typing.Dict[str, bool]] = []
         self.current_function = FunctionType.NONE
 
+    def visit_this_expr(self, expr: This) -> typing.Any:
+        self.resolve_local(expr, expr.keyword)
+        return None
+
     def visit_get_expr(self, expr: Get) -> typing.Any:
         self.resolve_ast_node(expr.obj)
         return None
@@ -57,9 +62,15 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_class_stmt(self, stmt: Class) -> typing.Any:
         self.declare(stmt.name)
         self.define(stmt.name)
+
+        self.begin_scope()
+        self.scopes[-1]["this"] = True
+
         for method in stmt.methods:
             declaration = FunctionType.METHOD
             self.resolve_function(method, declaration)
+
+        self.end_scope()
         return None
 
     def visit_var_stmt(self, stmt: Var) -> typing.Any:

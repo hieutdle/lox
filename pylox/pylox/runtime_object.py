@@ -34,8 +34,13 @@ class LoxFunction(LoxCallable):
     def arity(self) -> int:
         return len(self.declaration.params)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<fn {self.declaration.name.lexeme}>"
+
+    def bind(self, instance: "LoxInstance") -> "LoxFunction":
+        env = Environment(self.closure)
+        env.define("this", instance)
+        return LoxFunction(self.declaration, env)
 
 
 class LoxClass(LoxCallable):
@@ -71,7 +76,7 @@ class LoxInstance:
             return self.fields.get(name.lexeme)
         method = self.lox_class.find_method(name.lexeme)
         if method is not None:
-            return method
+            return method.bind(self)
         raise LoxRuntimeError(name, f"Undefined property {name.lexeme}.")
 
     def set(self, name: Token, value: typing.Any):

@@ -24,6 +24,9 @@ class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):
     def resolve(self, expr: Expr, depth: int) -> None:
         self.locals[expr] = depth
 
+    def visit_this_expr(self, expr: expr_ast.This) -> typing.Any:
+        return self.lookup_variable(expr.keyword, expr)
+
     def visit_get_expr(self, expr: expr_ast.Get) -> typing.Any:
         obj = self.evaluate(expr.obj)
         if isinstance(obj, LoxInstance):

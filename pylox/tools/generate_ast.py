@@ -80,6 +80,7 @@ if __name__ == "__main__":
             "Call     : Expr callee, Token paren, typing.List[Expr] arguments",
             "Get      : Expr obj, Token name",
             "Set      : Expr obj, Token name, Expr value",
+            "This     : Token keyword",
         ],
     )
     define_ast(
