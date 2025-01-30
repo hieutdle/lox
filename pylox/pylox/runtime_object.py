@@ -17,9 +17,12 @@ class LoxCallable(ABC):
 
 
 class LoxFunction(LoxCallable):
-    def __init__(self, declaration: Function, closure: Environment):
+    def __init__(
+        self, declaration: Function, closure: Environment, is_init: bool
+    ) -> None:
         self.declaration = declaration
         self.closure = closure
+        self.is_init = is_init
 
     def call(self, interpreter, args: list) -> typing.Any:
         env = Environment(self.closure)
@@ -28,7 +31,11 @@ class LoxFunction(LoxCallable):
         try:
             interpreter.execute_block(self.declaration.body, env)
         except Return as return_value:
+            if self.is_init:
+                return self.closure.get_at(0, "this")
             return return_value.value
+        if self.is_init:
+            return self.closure.get_at(0, "this")
         return None
 
     def arity(self) -> int:
@@ -40,7 +47,7 @@ class LoxFunction(LoxCallable):
     def bind(self, instance: "LoxInstance") -> "LoxFunction":
         env = Environment(self.closure)
         env.define("this", instance)
-        return LoxFunction(self.declaration, env)
+        return LoxFunction(self.declaration, env, self.is_init)
 
 
 class LoxClass(LoxCallable):
@@ -49,10 +56,17 @@ class LoxClass(LoxCallable):
         self.methods = methods
 
     def call(self, interpreter, args: list) -> typing.Any:
-        return LoxInstance(self)
+        instance = LoxInstance(self)
+        initializer = self.find_method("init")
+        if initializer is not None:
+            initializer.bind(instance).call(interpreter, args)
+        return instance
 
     def arity(self) -> int:
-        return 0
+        initializer = self.find_method("init")
+        if initializer is None:
+            return 0
+        return initializer.arity()
 
     def __str__(self) -> str:
         return self.name
