@@ -3,7 +3,7 @@
 import typing
 from abc import ABC, abstractmethod
 
-from pylox.expr import Expr
+from pylox.expr import Expr, Variable
 
 from pylox.tokens import Token
 
@@ -125,8 +125,9 @@ class Return(Stmt):
         return visitor.visit_return_stmt(self)
 
 class Class(Stmt):
-    def __init__(self, name: Token, methods: typing.List[Function]):
+    def __init__(self, name: Token, superclass: typing.Optional[Variable], methods: typing.Dict[str,Function]):
         self.name = name
+        self.superclass = superclass
         self.methods = methods
 
     def accept(self, visitor: StmtVisitor) -> typing.Any:

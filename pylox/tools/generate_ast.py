@@ -13,7 +13,7 @@ def define_ast(output_dir, base_name, types):
         f.write("from abc import ABC, abstractmethod\n\n")
 
         if base_name == "Stmt":
-            f.write("from pylox.expr import Expr\n\n")
+            f.write("from pylox.expr import Expr, Variable\n\n")
         f.write("from pylox.tokens import Token\n\n")
 
         f.write(f"class {base_name}Visitor(ABC):\n")
@@ -96,6 +96,6 @@ if __name__ == "__main__":
             "Break",
             "Function   : Token name, typing.List[Token] params, typing.List[Stmt] body",
             "Return     : Token keyword, typing.Optional[Expr] value",
-            "Class      : Token name, typing.List[Function] methods",
+            "Class      : Token name, typing.Optional[Variable] superclass, typing.Dict[str,Function] methods",
         ],
     )
