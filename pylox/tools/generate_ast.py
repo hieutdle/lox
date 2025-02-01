@@ -81,6 +81,7 @@ if __name__ == "__main__":
             "Get      : Expr obj, Token name",
             "Set      : Expr obj, Token name, Expr value",
             "This     : Token keyword",
+            "Super    : Token keyword, Token method",
         ],
     )
     define_ast(
@@ -96,6 +97,6 @@ if __name__ == "__main__":
             "Break",
             "Function   : Token name, typing.List[Token] params, typing.List[Stmt] body",
             "Return     : Token keyword, typing.Optional[Expr] value",
-            "Class      : Token name, typing.Optional[Variable] superclass, typing.Dict[str,Function] methods",
+            "Class      : Token name, typing.Optional[Variable] superclass, typing.List[Function] methods",
         ],
     )

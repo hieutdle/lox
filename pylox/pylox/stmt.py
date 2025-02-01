@@ -125,7 +125,7 @@ class Return(Stmt):
         return visitor.visit_return_stmt(self)
 
 class Class(Stmt):
-    def __init__(self, name: Token, superclass: typing.Optional[Variable], methods: typing.Dict[str,Function]):
+    def __init__(self, name: Token, superclass: typing.Optional[Variable], methods: typing.List[Function]):
         self.name = name
         self.superclass = superclass
         self.methods = methods

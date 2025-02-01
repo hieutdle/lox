@@ -13,6 +13,7 @@ from pylox.expr import (
     Literal,
     Logical,
     Set,
+    Super,
     This,
     Unary,
     Variable,
@@ -43,7 +44,8 @@ class FunctionType(Enum):
 
 class ClassType(Enum):
     NONE = (auto(),)
-    CLASS = auto()
+    CLASS = (auto(),)
+    SUBCLASS = auto()
 
 
 class Resolver(ExprVisitor, StmtVisitor):
@@ -51,7 +53,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.interpreter = interpreter
         self.scopes: typing.List[typing.Dict[str, bool]] = []
         self.current_function = FunctionType.NONE
-        self.current_class = ClassType.NONE
+        self.current_class = ClassType.SUBCLASS
 
     def visit_this_expr(self, expr: This) -> typing.Any:
         if self.current_class == ClassType.NONE:
@@ -76,6 +78,18 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.declare(stmt.name)
         self.define(stmt.name)
 
+        if stmt.superclass is not None:
+            if stmt.superclass.name.lexeme == stmt.name.lexeme:
+                raise LoxParseError(
+                    stmt.superclass.name, "A class can't inherit from itself."
+                )
+            self.current_class = ClassType.SUBCLASS
+            self.resolve_ast_node(stmt.superclass)
+
+        if stmt.superclass is not None:
+            self.begin_scope()
+            self.scopes[-1]["super"] = True
+
         self.begin_scope()
         self.scopes[-1]["this"] = True
 
@@ -86,7 +100,20 @@ class Resolver(ExprVisitor, StmtVisitor):
             self.resolve_function(method, declaration)
 
         self.end_scope()
+        if stmt.superclass is not None:
+            self.end_scope()
         self.current_class = enclosing_class
+        return None
+
+    def visit_super_expr(self, expr: Super) -> typing.Any:
+        if self.current_class is ClassType.NONE:
+            raise LoxParseError(expr.keyword, "Can't use 'super' outside of a class.")
+        if self.current_class is ClassType.CLASS:
+            raise LoxParseError(
+                expr.keyword,
+                "Can't use 'super' in a class with no superclass.",
+            )
+        self.resolve_local(expr, expr.keyword)
         return None
 
     def visit_var_stmt(self, stmt: Var) -> typing.Any:
