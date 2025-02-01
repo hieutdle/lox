@@ -7,6 +7,7 @@ A tree-walk interpreter written in Python for the Lox programming language, a la
 * ✅ Lexer
 * ✅ Parser
 * ✅ Block/Scope
+  
   ```lox
   var x = "global x";
   var y = "global y";
@@ -29,6 +30,7 @@ A tree-walk interpreter written in Python for the Lox programming language, a la
   print z; // expect: global z
   ```
 * ✅ Closure
+  
   ```lox
   var x = "global";
   {
@@ -43,6 +45,7 @@ A tree-walk interpreter written in Python for the Lox programming language, a la
   // expect: global
   ```
 * ✅ Loop
+  
   ```lox
   var i = 2;
   while (i < 12) {
@@ -65,6 +68,7 @@ A tree-walk interpreter written in Python for the Lox programming language, a la
   print a; // expect: 10946
   ```
 * ✅ Function
+  
   ```lox
   fun greet(first, last) {
     print "Hello, " + first + " " + last + "!";
@@ -92,6 +96,7 @@ A tree-walk interpreter written in Python for the Lox programming language, a la
   counter(); // expect: 2
   ```
 * ✅ Class
+  
   ```lox
   class Animal {
     speak() {
@@ -109,6 +114,7 @@ A tree-walk interpreter written in Python for the Lox programming language, a la
   cat.speak();
   ```
 * ✅ Inheritance
+  
   ```lox
   class Pastry {
     bake() {
