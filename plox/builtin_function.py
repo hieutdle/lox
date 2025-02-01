@@ -1,6 +1,6 @@
 import time
 from typing import Dict, Any
-from pylox.runtime_object import LoxCallable
+from plox.runtime_object import LoxCallable
 
 
 class Clock(LoxCallable):

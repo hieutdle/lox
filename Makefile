@@ -22,9 +22,9 @@ clean:
 .PHONY: test
 
 test:
-	PYTHONPATH=pylox pytest tests
+	PYTHONPATH=pytest tests
 
-.PhONY: run
+.PHONY: run
 
 run:
 	python3 pylox/__main__.py

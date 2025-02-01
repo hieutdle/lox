@@ -1,10 +1,10 @@
 from typing import List, Optional, Callable, cast
-from pylox.tokens import Token, TokenType
-from pylox.expr import Expr
-import pylox.expr as expr_ast
-from pylox.error import LoxParseError
-from pylox.stmt import Stmt
-import pylox.stmt as stmt_ast
+from plox.tokens import Token, TokenType
+from plox.expr import Expr
+import plox.expr as expr_ast
+from plox.error import LoxParseError
+from plox.stmt import Stmt
+import plox.stmt as stmt_ast
 import typing
 
 

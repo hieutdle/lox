@@ -1,5 +1,5 @@
-from pylox.expr import Expr, Binary, Grouping, Literal, Unary, ExprVisitor
-from pylox.tokens import Token, TokenType
+from plox.expr import Expr, Binary, Grouping, Literal, Unary, ExprVisitor
+from plox.tokens import Token, TokenType
 import typing
 
 

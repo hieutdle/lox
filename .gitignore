@@ -37,9 +37,6 @@
 .idea/
 *.iml
 
-# Vscode files
-.vscode
-
 # CMake
 build/
 cmake-build-debug/
@@ -219,3 +216,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# pixi environments
+.pixi
+*.egg-info
+# magic environments
+.magic

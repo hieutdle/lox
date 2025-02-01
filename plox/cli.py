@@ -2,12 +2,12 @@ import sys
 import typing as t
 from pathlib import Path
 
-from pylox.expr import Expr
-from pylox.resolver import Resolver
-from pylox.scanner import Scanner
-from pylox.error import LoxException, LoxRuntimeError, LoxParseError, LoxSyntaxError
-from pylox.interpreter import Interpreter
-from pylox.parser import Parser
+from plox.expr import Expr
+from plox.resolver import Resolver
+from plox.scanner import Scanner
+from plox.error import LoxException, LoxRuntimeError, LoxParseError, LoxSyntaxError
+from plox.interpreter import Interpreter
+from plox.parser import Parser
 import typing
 import typer
 from rich import print

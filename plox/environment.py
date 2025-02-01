@@ -1,6 +1,6 @@
 import typing
-from pylox.error import LoxRuntimeError
-from pylox.tokens import Token
+from plox.error import LoxRuntimeError
+from plox.tokens import Token
 
 
 class Environment:

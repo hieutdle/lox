@@ -1,6 +1,6 @@
-from pylox.ast_printer import AstPrinter, RpnAstPrinter
-from pylox.scanner import Token, TokenType
-import pylox.expr as ast
+from plox.ast_printer import AstPrinter, RpnAstPrinter
+from plox.scanner import Token, TokenType
+import plox.expr as ast
 
 
 # example from http://www.craftinginterpreters.com/representing-code.html#a-not-very-pretty-printer
