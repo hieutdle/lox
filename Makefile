@@ -22,9 +22,14 @@ clean:
 .PHONY: test
 
 test:
-	PYTHONPATH=pytest tests
+	@pytest
 
 .PHONY: run
 
 run:
-	python3 pylox/__main__.py
+	python3 plox/__main__.py
+
+.PHONY: requirements
+
+requirements:
+	@magic add $(shell tr '\n' ' ' < requirements.txt)
