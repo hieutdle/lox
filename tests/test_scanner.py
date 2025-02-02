@@ -1,8 +1,8 @@
 import pytest
 
-from plox.tokens import TokenType
-from plox.scanner import Scanner
-from plox.error import LoxSyntaxError
+from pylox.tokens import TokenType
+from pylox.scanner import Scanner
+from pylox.error import LoxSyntaxError
 
 
 def test_normal_input():

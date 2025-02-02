@@ -1,9 +1,9 @@
 import pytest
 
-from plox.ast_printer import AstPrinter
-from plox.parser import Parser
-from plox.scanner import Scanner
-from plox.error import LoxParseError
+from pylox.ast_printer import AstPrinter
+from pylox.parser import Parser
+from pylox.scanner import Scanner
+from pylox.error import LoxParseError
 
 
 def test_if_parser_produces_valid_ast() -> None:
