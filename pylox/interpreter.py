@@ -1,13 +1,13 @@
-import plox.expr as expr_ast
-import plox.stmt as stmt_ast
+import pylox.expr as expr_ast
+import pylox.stmt as stmt_ast
 import typing
-from plox.error import LoxRuntimeError, BreakException
-from plox.tokens import Token, TokenType
-from plox.expr import Expr
-from plox.stmt import Stmt
-from plox.environment import Environment
-from plox.runtime_object import LoxCallable, LoxClass, LoxFunction, LoxInstance, Return
-from plox.builtin_function import FUNCTIONS_MAPPING
+from pylox.error import LoxRuntimeError, BreakException
+from pylox.tokens import Token, TokenType
+from pylox.expr import Expr
+from pylox.stmt import Stmt
+from pylox.environment import Environment
+from pylox.runtime_object import LoxCallable, LoxClass, LoxFunction, LoxInstance, Return
+from pylox.builtin_function import FUNCTIONS_MAPPING
 
 
 class Interpreter(expr_ast.ExprVisitor, stmt_ast.StmtVisitor):

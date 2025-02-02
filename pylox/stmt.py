@@ -3,9 +3,9 @@
 import typing
 from abc import ABC, abstractmethod
 
-from plox.expr import Expr, Variable
+from pylox.expr import Expr, Variable
 
-from plox.tokens import Token
+from pylox.tokens import Token
 
 
 class StmtVisitor(ABC):

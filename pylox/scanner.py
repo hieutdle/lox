@@ -1,5 +1,5 @@
-from plox.tokens import Token, TokenType
-from plox.error import LoxSyntaxError
+from pylox.tokens import Token, TokenType
+from pylox.error import LoxSyntaxError
 from typing import List, Optional
 
 

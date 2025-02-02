@@ -3,7 +3,7 @@
 import typing
 from abc import ABC, abstractmethod
 
-from plox.tokens import Token
+from pylox.tokens import Token
 
 
 class ExprVisitor(ABC):

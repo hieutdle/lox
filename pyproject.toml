@@ -2,7 +2,7 @@
 authors = [{name = "hieutdle", email = "hieu.tdle@gmail.com"}]
 dependencies = []
 description = "Add a short description here"
-name = "plox"
+name = "pylox"
 requires-python = ">= 3.11"
 version = "0.1.0"
 
@@ -15,7 +15,7 @@ channels = ["https://conda.modular.com/max-nightly", "https://conda.modular.com/
 platforms = ["linux-64"]
 
 [tool.pixi.pypi-dependencies]
-plox = { path = ".", editable = true }
+pylox = { path = ".", editable = true }
 
 [tool.pixi.tasks]
 

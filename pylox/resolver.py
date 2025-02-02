@@ -1,8 +1,8 @@
 from enum import Enum, auto
 import typing
 
-from plox.error import LoxParseError
-from plox.expr import (
+from pylox.error import LoxParseError
+from pylox.expr import (
     Assign,
     Binary,
     Call,
@@ -18,8 +18,8 @@ from plox.expr import (
     Unary,
     Variable,
 )
-from plox.interpreter import Interpreter
-from plox.stmt import (
+from pylox.interpreter import Interpreter
+from pylox.stmt import (
     Block,
     Class,
     Expression,
@@ -32,7 +32,7 @@ from plox.stmt import (
     Var,
     While,
 )
-from plox.tokens import Token
+from pylox.tokens import Token
 
 
 class FunctionType(Enum):

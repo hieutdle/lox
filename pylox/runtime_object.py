@@ -1,9 +1,9 @@
 import typing
 from abc import ABC, abstractmethod
-from plox.error import LoxRuntimeError
-from plox.stmt import Function
+from pylox.error import LoxRuntimeError
+from pylox.stmt import Function
 from environment import Environment
-from plox.tokens import Token
+from pylox.tokens import Token
 
 
 class LoxCallable(ABC):
