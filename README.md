@@ -1,4 +1,4 @@
-# Plox
+# Pylox
 
 A tree-walk interpreter written in Python for the Lox programming language, a language created for the book [Crafting Interpreters](http://craftinginterpreters.com/).
 
